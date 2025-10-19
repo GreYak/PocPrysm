@@ -3,8 +3,9 @@ using Devices.Repositories;
 using Driver.Application;
 using Driver.Application.Contracts;
 using Driver.Application.Exceptions;
+using Driver.Application.Model;
 using Moq;
-using UnitTests.Driver.Application.DomainMocks;
+using UnitTests.Driver.Application.DomainHelpers;
 
 namespace UnitTests.Driver.Application
 {
@@ -67,68 +68,61 @@ namespace UnitTests.Driver.Application
         {
             // Arrange
             var variable = new AppVariable("myVar", "ExternalId_01", AppVariable.AppType.State);
-            var device = new Mock<ExternalDevice>();
-            device.Setup(d => d.GetAppVariables()).Returns(new[] { variable });
-
-            var devices = new List<ExternalDevice> { device.Object };
-
-            _appVariablesRepoMock.Setup(repo => repo.GetVariablesRootAsync()).ReturnsAsync(new MockAppVariablesRoot_AddOrUpdate(true));
-            _externalDeviceRepoMock.Setup(repo => repo.GetExternalDevices()).ReturnsAsync(devices);
+            _appVariablesRepoMock.Setup(repo => repo.GetVariablesRootAsync()).ReturnsAsync(new AppVariablesRootBuilder_AddOrUpdate(true).GenerateAppVariableRoot(variable));
+            _externalDeviceRepoMock.Setup(repo => repo.GetExternalDevices()).ReturnsAsync(new List<ExternalDevice> { new MockExternalDevices(variable) });
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<UseCaseException>(() => _service.ImportDevicesAsync());
-
-            Assert.Equal(nameof(ImportDevicesService.ImportDevicesAsync), exception.Source);
-            Assert.IsType<ApplicationException>(exception.InnerException);
         }
 
+        [Fact]
+        public async Task ImportDevicesAsync_WhenSaveAsyncThrown_ShouldPropagateException()
+        {
+            // Arrange
+            var variable = new AppVariable("myVar", "ExternalId_01", AppVariable.AppType.State);
+            _appVariablesRepoMock.Setup(repo => repo.GetVariablesRootAsync()).ReturnsAsync(new AppVariablesRootBuilder_AddOrUpdate(false).GenerateAppVariableRoot(variable));
+            _externalDeviceRepoMock.Setup(repo => repo.GetExternalDevices()).ReturnsAsync(new List<ExternalDevice> { new MockExternalDevices(variable) });
+            _appVariablesRepoMock.Setup(repo => repo.SaveAsync(It.IsAny<AppVariablesRoot>())).ThrowsAsync(new InvalidOperationException("DB error"));
 
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.ImportDevicesAsync());
+            Assert.Equal("DB error", exception.Message);
+        }
 
+        [Fact]
+        public async Task ImportDevicesAsync_WithNewValidDevices_ShouldImportCorrectly()
+        {
+            var variable = new AppVariable("myVar", "ExternalId_01", AppVariable.AppType.State);
+            _appVariablesRepoMock.Setup(repo => repo.GetVariablesRootAsync()).ReturnsAsync(new AppVariablesRootBuilder_AddOrUpdate(false).GenerateAppVariableRoot(variable));
+            _externalDeviceRepoMock.Setup(repo => repo.GetExternalDevices()).ReturnsAsync(new List<ExternalDevice> { new MockExternalDevices(variable) });
+            _appVariablesRepoMock.Setup(repo => repo.SaveAsync(It.IsAny<AppVariablesRoot>())).Returns(Task.CompletedTask);
 
+            // Act
+            ImportReportDto importReportDtoResult = await _service.ImportDevicesAsync();
 
-        //[Fact]
-        //public async Task ImportDevicesAsync_WithValidDevices_ShouldImportCorrectly()
-        //{
-        //    // Arrange
-        //    var variable1 = new AppVariable(); // mock your variable if needed
-        //    var variable2 = new AppVariable();
+            // Assert
+            Assert.NotNull(importReportDtoResult);
+            Assert.Equal(1, importReportDtoResult.ExternalDevicesCount);
+            Assert.Equal(1, importReportDtoResult.NewAppVariablesCount);
+            Assert.Equal(0, importReportDtoResult.UpdatedAppVariablesCount);
+        }
 
-        //    var device1 = new Mock<ExternalDevice>();
-        //    device1.Setup(d => d.GetAppVariables()).Returns(new[] { variable1 });
+        [Fact]
+        public async Task ImportDevicesAsync_WithValidDevicesForUpdate_ShouldImportCorrectly()
+        {
+            var variable = new AppVariable("myVar", "ExternalId_01", AppVariable.AppType.State);
+            _appVariablesRepoMock.Setup(repo => repo.GetVariablesRootAsync()).ReturnsAsync(new AppVariablesRootBuilder_AddOrUpdate(false).GenerateAppVariableRoot(variable));
+            _externalDeviceRepoMock.Setup(repo => repo.GetExternalDevices()).ReturnsAsync(new List<ExternalDevice> { new MockExternalDevices(variable) });
+            _appVariablesRepoMock.Setup(repo => repo.SaveAsync(It.IsAny<AppVariablesRoot>())).Returns(Task.CompletedTask);
 
-        //    var device2 = new Mock<ExternalDevice>();
-        //    device2.Setup(d => d.GetAppVariables()).Returns(new[] { variable2 });
+            // Act
+            ImportReportDto importReportDtoResult = await _service.ImportDevicesAsync();
 
-        //    var devices = new List<ExternalDevice> { device1.Object, device2.Object };
-
-        //    var appVariablesRoot = new Mock<AppVariablesRoot>();
-        //    appVariablesRoot.Setup(x => x.NewVariablesCount).Returns(1);
-        //    appVariablesRoot.Setup(x => x.UpdatedVariablesCount).Returns(1);
-
-        //    _appVariablesRepoMock.Setup(repo => repo.GetVariablesRootAsync())
-        //        .ReturnsAsync(appVariablesRoot.Object);
-
-        //    _externalDeviceRepoMock.Setup(repo => repo.GetExternalDevices())
-        //        .ReturnsAsync(devices);
-
-        //    // Act
-        //    var result = await _service.ImportDevicesAsync();
-
-        //    // Assert
-        //    device1.Verify(d => d.GetAppVariables(), Times.Once);
-        //    device2.Verify(d => d.GetAppVariables(), Times.Once);
-
-        //    appVariablesRoot.Verify(a => a.AddOrUpdateVariable(variable1), Times.Once);
-        //    appVariablesRoot.Verify(a => a.AddOrUpdateVariable(variable2), Times.Once);
-
-        //    _appVariablesRepoMock.Verify(r => r.SaveAsync(appVariablesRoot.Object), Times.Once);
-
-        //    Assert.Equal(2, result.TotalDevices);
-        //    Assert.Equal(1, result.NewVariables);
-        //    Assert.Equal(1, result.UpdatedVariables);
-        //}
-
-
-
+            // Assert
+            Assert.NotNull(importReportDtoResult);
+            Assert.Equal(1, importReportDtoResult.ExternalDevicesCount);
+            Assert.Equal(0, importReportDtoResult.NewAppVariablesCount);
+            Assert.Equal(1, importReportDtoResult.UpdatedAppVariablesCount);
+        }
     }
 }
