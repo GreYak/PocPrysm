@@ -31,7 +31,7 @@ namespace Devices
             if (Type != AppType.Node)
                 throw new InvalidOperationException($"{nameof(AddChildren)} not allowed for type : {Type}");
 
-            EnsureKeyUnicity(variableToAdd.ChildrenKeys);
+            EnsureKeyUnicity(variableToAdd.AllKeys);
 
             _children.Add(variableToAdd);
         }
@@ -40,14 +40,14 @@ namespace Devices
 
         internal void EnsureKeyUnicity(IEnumerable<string> keysToCheck)
         {
-            IEnumerable<string> duplicateKeys = ChildrenKeys.Intersect(keysToCheck);
+            IEnumerable<string> duplicateKeys = AllKeys.Intersect(keysToCheck);
             if (duplicateKeys.Any())
             {
                 throw new DuplicateVariableException(duplicateKeys);
             }
         }
 
-        internal IEnumerable<string> ChildrenKeys
+        internal IEnumerable<string> AllKeys
         {
             get
             {
@@ -55,7 +55,7 @@ namespace Devices
 
                 foreach (var child in _children)
                 {
-                    foreach (var key in child.ChildrenKeys)
+                    foreach (var key in child.AllKeys)
                     {
                         yield return key;
                     }

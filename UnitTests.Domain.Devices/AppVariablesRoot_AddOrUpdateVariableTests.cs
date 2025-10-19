@@ -28,14 +28,14 @@ namespace UnitTests.Domain.Devices
             var originalVar = new AppVariable("Var1", "ext1", AppVariable.AppType.State);
             var root = new AppVariablesRoot(new List<AppVariable> { originalVar });
 
-            var updatedVar = new AppVariable("Var1", "ext2", AppVariable.AppType.Node); // same Key (Name)
+            var updatedVar = new AppVariable("Var1", "ext2", AppVariable.AppType.Node); 
 
             // Act
             root.AddOrUpdateVariable(updatedVar);
 
             // Assert
             Assert.Contains(updatedVar, root.Variables);
-            Assert.DoesNotContain(originalVar, root.Variables);
+            Assert.DoesNotContain(root.Variables, v => ReferenceEquals(v, originalVar));
             Assert.Equal(0, root.NewVariablesCount);
             Assert.Equal(1, root.UpdatedVariablesCount);
         }

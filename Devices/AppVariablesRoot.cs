@@ -41,7 +41,9 @@
             if (!_variablesByName.ContainsKey(variableToUpdate.Key))
                 throw new KeyNotFoundException(variableToUpdate.Key);
 
-            EnsureVariableKeyUnicity(variableToUpdate);
+            var keysToCheckExceptCurrentKey = variableToUpdate.AllKeys.ToList();
+            keysToCheckExceptCurrentKey.Remove(variableToUpdate.Key);   
+            EnsureVariableKeyUnicity(keysToCheckExceptCurrentKey);
 
             _variablesByName[variableToUpdate.Key] = variableToUpdate;
             _updatedVariables.Add(variableToUpdate.Key);
@@ -49,18 +51,16 @@
 
         private void AddVariable(AppVariable variableToAdd)
         {
-            EnsureVariableKeyUnicity(variableToAdd);
+            EnsureVariableKeyUnicity(variableToAdd.AllKeys);
 
             _variablesByName.Add(variableToAdd.Key, variableToAdd);
             _addedVariables.Add(variableToAdd.Key);
         }
 
-        private void EnsureVariableKeyUnicity(AppVariable variableToCheck)
+        private void EnsureVariableKeyUnicity(IEnumerable<string> variableKeysToCheck)
         {
-            IEnumerable<string> keysToCheck = variableToCheck.ChildrenKeys;
-
             foreach (AppVariable var in _variablesByName.Values)
-                var.EnsureKeyUnicity(keysToCheck);
+                var.EnsureKeyUnicity(variableKeysToCheck);
         }
     }
 }
