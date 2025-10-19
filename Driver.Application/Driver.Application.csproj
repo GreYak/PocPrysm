@@ -14,4 +14,8 @@
     <ProjectReference Include="..\Devices\Devices.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="UnitTests.Driver.Application" />
+  </ItemGroup>
+  
 </Project>

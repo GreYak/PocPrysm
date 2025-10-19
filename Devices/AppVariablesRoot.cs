@@ -1,7 +1,4 @@
-﻿
-using Devices.Exceptions;
-
-namespace Devices
+﻿namespace Devices
 {
     public class AppVariablesRoot
     {
@@ -60,7 +57,7 @@ namespace Devices
 
         private void EnsureVariableKeyUnicity(AppVariable variableToCheck)
         {
-            IEnumerable<string> keysToCheck = variableToCheck.AllKeys;
+            IEnumerable<string> keysToCheck = variableToCheck.ChildrenKeys;
 
             foreach (AppVariable var in _variablesByName.Values)
                 var.EnsureKeyUnicity(keysToCheck);
