@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Driver.Application\Driver.Application.csproj" />
+    <ProjectReference Include="..\Driver.Infrastructure\Driver.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

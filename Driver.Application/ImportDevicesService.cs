@@ -1,6 +1,7 @@
 ﻿using Devices;
 using Devices.Repositories;
 using Driver.Application.Contracts;
+using Driver.Application.Exceptions;
 using Driver.Application.Model;
 
 namespace Driver.Application
@@ -20,12 +21,20 @@ namespace Driver.Application
         {
             AppVariablesRoot appVariablesRoot = await _appVariablesRootRepository.GetVariablesRootAsync();
             IEnumerable<ExternalDevice> externalDevices = await _externalDeviceRepository.GetExternalDevices();
+            if (!externalDevices.Any())
+                throw new EntityNotFoundException(nameof(ExternalDevice));
 
-            // TODO : try/catch
-            foreach (ExternalDevice device in externalDevices)
+            try
             {
-                foreach (AppVariable variableFromExternalDevice in device.GetAppVariables())
-                    appVariablesRoot.AddOrUpdateVariable(variableFromExternalDevice);
+                foreach (ExternalDevice device in externalDevices)
+                {
+                    foreach (AppVariable variableFromExternalDevice in device.GetAppVariables())
+                        appVariablesRoot.AddOrUpdateVariable(variableFromExternalDevice);
+                }
+            }
+            catch (ApplicationException exc) 
+            {
+                throw new UseCaseException(nameof(ImportDevicesService.ImportDevicesAsync), exc);
             }
 
             await _appVariablesRootRepository.SaveAsync(appVariablesRoot);
