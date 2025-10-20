@@ -11,7 +11,7 @@ namespace UnitTests.Driver.Application.DomainHelpers
             _withException = withException;
         }
 
-        public AppVariablesRoot GenerateAppVariableRoot(AppVariable refAppVariable)
+        public AppVariablesRoot GenerateAppVariableRoot(AppVariable refAppVariable, bool isForUpdate)
         {
             var variables = new List<AppVariable>();
 
@@ -22,8 +22,12 @@ namespace UnitTests.Driver.Application.DomainHelpers
 
                 variables.Add(variable);
             }
+            else if (isForUpdate)
+            {
+                variables.Add(refAppVariable);
+            }
 
-            return new AppVariablesRoot(variables);
+           return new AppVariablesRoot(variables);
         }
     }
 }

@@ -68,7 +68,7 @@ namespace UnitTests.Driver.Application
         {
             // Arrange
             var variable = new AppVariable("myVar", "ExternalId_01", AppVariable.AppType.State);
-            _appVariablesRepoMock.Setup(repo => repo.GetVariablesRootAsync()).ReturnsAsync(new AppVariablesRootBuilder_AddOrUpdate(true).GenerateAppVariableRoot(variable));
+            _appVariablesRepoMock.Setup(repo => repo.GetVariablesRootAsync()).ReturnsAsync(new AppVariablesRootBuilder_AddOrUpdate(true).GenerateAppVariableRoot(variable, false));
             _externalDeviceRepoMock.Setup(repo => repo.GetExternalDevices()).ReturnsAsync(new List<ExternalDevice> { new MockExternalDevices(variable) });
 
             // Act & Assert
@@ -80,7 +80,7 @@ namespace UnitTests.Driver.Application
         {
             // Arrange
             var variable = new AppVariable("myVar", "ExternalId_01", AppVariable.AppType.State);
-            _appVariablesRepoMock.Setup(repo => repo.GetVariablesRootAsync()).ReturnsAsync(new AppVariablesRootBuilder_AddOrUpdate(false).GenerateAppVariableRoot(variable));
+            _appVariablesRepoMock.Setup(repo => repo.GetVariablesRootAsync()).ReturnsAsync(new AppVariablesRootBuilder_AddOrUpdate(false).GenerateAppVariableRoot(variable, false));
             _externalDeviceRepoMock.Setup(repo => repo.GetExternalDevices()).ReturnsAsync(new List<ExternalDevice> { new MockExternalDevices(variable) });
             _appVariablesRepoMock.Setup(repo => repo.SaveAsync(It.IsAny<AppVariablesRoot>())).ThrowsAsync(new InvalidOperationException("DB error"));
 
@@ -93,7 +93,7 @@ namespace UnitTests.Driver.Application
         public async Task ImportDevicesAsync_WithNewValidDevices_ShouldImportCorrectly()
         {
             var variable = new AppVariable("myVar", "ExternalId_01", AppVariable.AppType.State);
-            _appVariablesRepoMock.Setup(repo => repo.GetVariablesRootAsync()).ReturnsAsync(new AppVariablesRootBuilder_AddOrUpdate(false).GenerateAppVariableRoot(variable));
+            _appVariablesRepoMock.Setup(repo => repo.GetVariablesRootAsync()).ReturnsAsync(new AppVariablesRootBuilder_AddOrUpdate(false).GenerateAppVariableRoot(variable, false));
             _externalDeviceRepoMock.Setup(repo => repo.GetExternalDevices()).ReturnsAsync(new List<ExternalDevice> { new MockExternalDevices(variable) });
             _appVariablesRepoMock.Setup(repo => repo.SaveAsync(It.IsAny<AppVariablesRoot>())).Returns(Task.CompletedTask);
 
@@ -111,7 +111,7 @@ namespace UnitTests.Driver.Application
         public async Task ImportDevicesAsync_WithValidDevicesForUpdate_ShouldImportCorrectly()
         {
             var variable = new AppVariable("myVar", "ExternalId_01", AppVariable.AppType.State);
-            _appVariablesRepoMock.Setup(repo => repo.GetVariablesRootAsync()).ReturnsAsync(new AppVariablesRootBuilder_AddOrUpdate(false).GenerateAppVariableRoot(variable));
+            _appVariablesRepoMock.Setup(repo => repo.GetVariablesRootAsync()).ReturnsAsync(new AppVariablesRootBuilder_AddOrUpdate(false).GenerateAppVariableRoot(variable, true));
             _externalDeviceRepoMock.Setup(repo => repo.GetExternalDevices()).ReturnsAsync(new List<ExternalDevice> { new MockExternalDevices(variable) });
             _appVariablesRepoMock.Setup(repo => repo.SaveAsync(It.IsAny<AppVariablesRoot>())).Returns(Task.CompletedTask);
 
