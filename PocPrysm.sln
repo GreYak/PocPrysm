@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.Driver.Applicatio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.Domain.Devices", "UnitTests.Domain.Devices\UnitTests.Domain.Devices.csproj", "{4D99B272-E47B-4CDF-8BC9-0AF87783CE05}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValidationTests", "ValidationTests\ValidationTests.csproj", "{82E0F787-5AF2-49A4-BEE7-598CBB45668D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{4D99B272-E47B-4CDF-8BC9-0AF87783CE05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D99B272-E47B-4CDF-8BC9-0AF87783CE05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D99B272-E47B-4CDF-8BC9-0AF87783CE05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82E0F787-5AF2-49A4-BEE7-598CBB45668D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82E0F787-5AF2-49A4-BEE7-598CBB45668D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82E0F787-5AF2-49A4-BEE7-598CBB45668D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82E0F787-5AF2-49A4-BEE7-598CBB45668D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
