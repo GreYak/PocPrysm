@@ -14,7 +14,7 @@ namespace Driver.Infrastructure
             devices.Add(new OpcUnite(2, Guid.NewGuid()));
 
             devices.Add(new OpcSite(56, "007", new string[] { "val1", "val2", "val3" }, 2));
-            devices.Add(new OpcSite(56, "00157", new string[] { "val4" }, 1));
+            devices.Add(new OpcSite(57, "00157", new string[] { "val4" }, 1));
 
             return devices;
         }
