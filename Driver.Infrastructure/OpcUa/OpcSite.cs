@@ -21,18 +21,18 @@ namespace Driver.Infrastructure.OpcUa
         public override IEnumerable<AppVariable> GetAppVariables()
         {
             var appVariable = new AppVariable($"OpcSite-{_id}", _code, AppVariable.AppType.Node);
-            for(int i=0; 1 < _subSitesCount; i++)
+            for(int i=0; i < _subSitesCount; i++)
             {
                 var child = new AppVariable($"OpcSubSite-{_id}-{i}",_code, AppVariable.AppType.State);
-                appVariable.SetValue($"{_code}-{_values[i]}");
+                child.SetValue($"{_code}-{_values[i]}");
 
                 appVariable.AddChildren(child);
             }
 
             var countVariable = new AppVariable($"OpcSite-{_id}-Count", _code, AppVariable.AppType.State);
-            appVariable.SetValue(_values.Count().ToString());
+            countVariable.SetValue(_values.Count().ToString());
 
-            return new List<AppVariable> { appVariable };
+            return new List<AppVariable> { appVariable, countVariable };
 
         }
     }
